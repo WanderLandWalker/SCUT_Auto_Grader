@@ -2,7 +2,7 @@
 
 **华南理工大学作业互评自动脚本**
 
- [![Greasy Fork](https://img.shields.io/badge/Greasy_Fork-安装脚本-green?style=flat)](https://greasyfork.org/zh-CN/scripts/519362)[![Release](https://img.shields.io/badge/Release-v6.0-blue?style=flat)](https://github.com/WanderLandWalker/SCUT_Auto_Grader/releases/latest)[![License](https://img.shields.io/badge/License-GPL--3.0-green?style=flat)](https://github.com/WanderLandWalker/SCUT_Auto_Grader/blob/master/LICENSE)
+ [![ScriptCat](https://img.shields.io/badge/ScriptCat-安装脚本-orange?style=flat)](https://scriptcat.org/zh-CN/script-show-page/6456)[![Release](https://img.shields.io/badge/Release-v6.0-blue?style=flat)](https://github.com/WanderLandWalker/SCUT_Auto_Grader/releases/latest)[![License](https://img.shields.io/badge/License-GPL--3.0-green?style=flat)](https://github.com/WanderLandWalker/SCUT_Auto_Grader/blob/master/LICENSE)
 
 ---
 
@@ -30,7 +30,7 @@
 
 ### 方式一：从脚本平台安装（推荐）
 
- [![Greasy Fork](https://img.shields.io/badge/-Greasy_Fork-黑色?style=flat)](https://greasyfork.org/zh-CN/scripts/519362)
+ [![ScriptCat](https://img.shields.io/badge/-ScriptCat-orange?style=flat)](https://scriptcat.org/zh-CN/script-show-page/6456)
 
 1. 安装油猴管理器：[Tampermonkey](https://www.tampermonkey.net/) 或 [Violentmonkey](https://violentmonkey.github.io/)
 2. 点击上方平台链接，点击"安装"即可
