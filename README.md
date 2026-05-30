@@ -114,6 +114,10 @@
 
 [![GitHub Stars](https://img.shields.io/github/stars/WanderLandWalker/SCUT_Auto_Grader?style=social)](https://github.com/WanderLandWalker/SCUT_Auto_Grader)
 
+也欢迎请作者喝杯咖啡：
+
+[![赞赏码](https://raw.githubusercontent.com/WanderLandWalker/SCUT_Lesson_Table/master/images/donate.jpg)](https://github.com/WanderLandWalker/SCUT_Lesson_Table/blob/master/images/donate.jpg)
+
 ## 许可证
 
 [GPL-3.0 License](https://github.com/WanderLandWalker/SCUT_Auto_Grader/blob/master/LICENSE)
