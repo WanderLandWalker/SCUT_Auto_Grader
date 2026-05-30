@@ -164,6 +164,7 @@
     function onProviderChange(){
         var idx=parseInt(getSelValue('gp-provider')),p=PROVIDERS[idx];if(!p)return;
         save('gp-provider',idx);
+        // 只填入默认URL，不保存（用户手动改才保存）
         document.getElementById('gp-url').value=p.url;
         var inp=document.getElementById('gp-mdl'),sel=document.getElementById('gp-mdl-sel');
         sel.innerHTML='';
@@ -172,7 +173,7 @@
             sel.style.display='block';inp.value=p.models[0];
             document.getElementById('gp-mdl-ht').textContent='点选列表或手动输入，也可点获取拉取最新';
         }else{sel.style.display='none';inp.value='';inp.placeholder='手动输入模型名称';document.getElementById('gp-mdl-ht').textContent='自定义供应商，填写URL和Key后点获取'}
-        save('gp-mdl',inp.value);
+        // 只填入默认模型，不保存
     }
 
     async function fetchModels(){
