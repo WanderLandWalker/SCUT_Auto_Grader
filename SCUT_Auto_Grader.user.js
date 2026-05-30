@@ -118,6 +118,7 @@
 +'    </div>'
 +'    <select id="gp-mdl-sel" size="5" style="display:none;margin-top:4px;font-size:11px"></select>'
 +'    <div class="hint" id="gp-mdl-ht">选供应商 → 填Key → 点获取模型</div>'
++'    <div style="margin-top:4px"><button type="button" class="btn btn-red btn-sm" id="gp-clear-key" style="width:auto;padding:4px 10px;font-size:10px">清除已保存的API Key</button></div>'
 +'  </div>'
 +'  <div id="gp-imp" style="display:none" class="card">'
 +'    <label>粘贴AI返回的JSON</label>'
@@ -520,6 +521,20 @@
 
     var sk=load('gp-key');if(sk)document.getElementById('gp-key').value=sk;
     document.getElementById('gp-key').onchange=function(){save('gp-key',this.value)};
+
+    // 清除API Key按钮
+    document.getElementById('gp-clear-key').onclick=function(e){
+        e.preventDefault();
+        del('gp-key');
+        document.getElementById('gp-key').value='';
+        log('API Key已清除','o');
+    };
+
+    // 隐私提示
+    if(!load('privacy_acknowledged')){
+        var ack=confirm('隐私提示：\n\nAI评分模式会将【题目、参考答案、学生回答】发送到你选择的AI供应商服务器。\n\n请确认你了解此风险后继续使用。\n\n点击"确定"不再提示，点"取消"暂不使用AI功能。');
+        if(ack)save('privacy_acknowledged','1');
+    }
 
     log('脚本已加载 v6.0','o');checkResume();
 
