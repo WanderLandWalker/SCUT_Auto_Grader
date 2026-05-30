@@ -95,7 +95,7 @@
 +'</style>'
 +'<div class="hdr"><h3>互评助手 v6.0</h3><button type="button" class="btn-min" id="gp-min">-</button></div>'
 +'<div class="bd" id="gp-body">'
-+'  <div class="status-bar" id="gp-st">就绪</div>'
++'  <div class="status-bar" id="gp-st"><span id="gp-dot" style="display:inline-block;width:8px;height:8px;border-radius:50%;background:#a6e3a1;margin-right:6px;vertical-align:middle"></span><span id="gp-st-text">就绪</span></div>'
 +'  <div class="section-title">评分模式</div>'
 +'  <div class="modes" id="gp-modes">'
 +'    <div class="m on" data-m="full">默认满分</div>'
@@ -142,8 +142,14 @@
 +'</div>';
     document.body.appendChild(P);
 
-    var $log=document.getElementById('gp-lg'),$st=document.getElementById('gp-st'),$body=document.getElementById('gp-body'),$ai=document.getElementById('gp-ai'),$imp=document.getElementById('gp-imp');
+    var $log=document.getElementById('gp-lg'),$body=document.getElementById('gp-body'),$ai=document.getElementById('gp-ai'),$imp=document.getElementById('gp-imp');
     var mode='full',imported=[],exportDirHandle=null,exportDirName='';
+
+    function setStatus(text,ok){
+        var dot=document.getElementById('gp-dot'),txt=document.getElementById('gp-st-text');
+        if(dot)dot.style.background=(ok===false)?'#f38ba8':'#a6e3a1';
+        if(txt)txt.textContent=text;
+    }
 
     function log(m,c){c=c||'i';var d=document.createElement('div');d.className=c;d.textContent='['+new Date().toLocaleTimeString()+'] '+m;$log.appendChild(d);$log.scrollTop=$log.scrollHeight;console.log('[互评] '+m)}
     function save(k,v){try{localStorage.setItem('gp44_'+k,typeof v==='string'?v:JSON.stringify(v))}catch(e){}}
@@ -235,7 +241,7 @@
         if(lastSubmit&&(now-parseInt(lastSubmit))<cooldown){
             var waitSec=Math.ceil((cooldown-(now-parseInt(lastSubmit)))/1000);
             log('系统冷却中，等待 '+waitSec+' 秒...','w');
-            document.getElementById('gp-st').textContent='冷却: '+waitSec+'秒';
+            setStatus('冷却: '+waitSec+'秒', false);
             setTimeout(clickSubmit,1000);return
         }
         save('lastSubmitTime',String(Date.now()));
@@ -265,12 +271,12 @@
     async function startTask(t){
         del('lastOp');
         if(t==='export'){
-            if(window.showDirectoryPicker){try{log('请选择保存文件夹...','i');var h=await window.showDirectoryPicker({mode:'readwrite'});exportDirName='互评导出_'+new Date().toISOString().slice(0,19).replace(/[:\-T]/g,'');exportDirHandle=await h.getDirectoryHandle(exportDirName,{create:true});log('保存到: '+h.name+'/'+exportDirName,'o')}catch(e){log('已取消','w');$st.textContent='已取消';return}}
+            if(window.showDirectoryPicker){try{log('请选择保存文件夹...','i');var h=await window.showDirectoryPicker({mode:'readwrite'});exportDirName='互评导出_'+new Date().toISOString().slice(0,19).replace(/[:\-T]/g,'');exportDirHandle=await h.getDirectoryHandle(exportDirName,{create:true});log('保存到: '+h.name+'/'+exportDirName,'o')            }catch(e){log('已取消','w');setStatus('已取消',false);return}}
             else log('浏览器不支持选文件夹，用默认下载','w')
         }
         var ts=document.getElementById('MainContent_dropTitleList'),ss=document.getElementById('MainContent_dropStudent');
         var st={task:t,tIdx:ts?ts.selectedIndex:0,sIdx:ss?ss.selectedIndex:0,phase:'work',data:[]};
-        save('task',t);save('state',st);log('启动 ['+t+']','o');$st.textContent='运行中...';doStep()
+        save('task',t);save('state',st);log('启动 ['+t+']','o');setStatus('运行中...',true);doStep()
     }
 
     function doStep(){
@@ -299,7 +305,7 @@
             __doPostBack('ctl00$MainContent$dropTitleList','')
         }else{
             if(s.task==='export'&&s.data&&s.data.length)finishExport(s.data);
-            del('task');del('state');log('全部完成!','o');$st.textContent='全部完成!'
+            del('task');del('state');log('全部完成!','o');setStatus('全部完成!',true)
         }
     }
 
@@ -334,7 +340,7 @@
         log('AI评分: '+stu+' ['+mdl+']...','i');
         callAI(url,key,mdl,AI_PROMPT,pg).then(function(r){
             if(r){setScore(r.score,r.comment);log('-> '+r.score+'分','o');s.phase='advance';save('state',s);clickSubmit()}
-            else{log('AI打分失败，已停止任务，请查看日志排查。','e');document.getElementById('gp-st').textContent='AI错误，已停止';del('task');del('state')}
+            else{log('AI打分失败，已停止任务，请查看日志排查。','e');setStatus('AI错误，已停止',false);del('task');del('state')}
         })
     }
 
@@ -343,7 +349,7 @@
         if(pg.alreadyGraded&&shouldSkip()){log(getSelText('MainContent_dropStudent')+' 已评过，跳过','w');s.phase='advance';save('state',s);doAdvance(s);return}
         s.data=s.data||[];
         s.data.push({title:getSelText('MainContent_dropTitleList'),student:getSelText('MainContent_dropStudent'),qType:pg.qType,qText:pg.qText,refAns:pg.refAns,stuAns:pg.stuAns,hasAns:pg.hasAns,noSubmit:pg.noSubmit,hasFile:pg.hasFile});
-        save('state',s);log('导出: '+getSelText('MainContent_dropStudent'),'i');$st.textContent='导出中 '+s.data.length+'条';
+        save('state',s);log('导出: '+getSelText('MainContent_dropStudent'),'i');setStatus('导出中 '+s.data.length+'条',true);
         if(pg.qType==='综合题'&&pg.hasFile&&!pg.noSubmit){downloadStudentFile(function(){s.phase='advance';save('state',s);doAdvance(s)})}
         else{s.phase='advance';save('state',s);doAdvance(s)}
     }
@@ -420,7 +426,7 @@
         var ts=document.getElementById('MainContent_dropTitleList'),ss=document.getElementById('MainContent_dropStudent');if(!ts||!ss)return;
         if(s.sIdx+1<ss.options.length){s.sIdx++;s.phase='work';save('state',s);ss.selectedIndex=s.sIdx;ss.dispatchEvent(new Event('change',{bubbles:true}))}
         else if(s.tIdx+1<ts.options.length){s.tIdx++;s.sIdx=0;s.phase='work';save('state',s);ts.selectedIndex=s.tIdx;ts.dispatchEvent(new Event('change',{bubbles:true}))}
-        else{if(s.task==='export'&&s.data&&s.data.length)finishExport(s.data);del('task');del('state');del('lastOp');log('全部完成!','o');$st.textContent='全部完成!'}
+        else{if(s.task==='export'&&s.data&&s.data.length)finishExport(s.data);del('task');del('state');del('lastOp');log('全部完成!','o');setStatus('全部完成!',true)}
     }
 
     async function finishExport(data){
@@ -465,10 +471,10 @@
         };
         log('====================','o');log('导出完成! 共 '+data.length+' 条','o');log('可评分: '+gradable.length+' | 跳过: '+skipped.length,'o');
         if(exportDirHandle)log('文件已保存到: '+exportDirName+'/','o');else log('文件已下载','o');
-        log('↑ 点绿色按钮复制Prompt给AI','o');log('====================','o');$st.textContent='完成! 复制Prompt给AI'
+        log('↑ 点绿色按钮复制Prompt给AI','o');log('====================','o');setStatus('完成! 复制Prompt给AI',true)
     }
 
-    async function checkResume(){var t=load('task'),s=loadJ('state');if(!t||!s)return;log('恢复任务: '+t,'w');$st.textContent='恢复运行...';mode=t;
+    async function checkResume(){var t=load('task'),s=loadJ('state');if(!t||!s)return;log('恢复任务: '+t,'w');setStatus('恢复运行...',true);mode=t;
     var btns=document.querySelectorAll('#gp-modes .m');for(var i=0;i<btns.length;i++)btns[i].classList.toggle('on',btns[i].getAttribute('data-m')===mode);
     $ai.style.display=(mode==='ai')?'block':'none';$imp.style.display=(mode==='import')?'block':'none';setTimeout(doStep,800)}
 
@@ -483,7 +489,7 @@
         h.innerHTML=hints[mode]||''}})(modeBtns[i])}
 
     document.getElementById('gp-go').onclick=function(e){e.preventDefault();startTask(mode)};
-    document.getElementById('gp-stop').onclick=function(e){e.preventDefault();del('task');del('state');exportDirHandle=null;log('已停止','w');$st.textContent='已停止'};
+    document.getElementById('gp-stop').onclick=function(e){e.preventDefault();del('task');del('state');exportDirHandle=null;log('已停止','w');setStatus('已停止',false)};
     document.getElementById('gp-exp').onclick=function(e){e.preventDefault();startTask('export')};
     document.getElementById('gp-provider').onchange=function(e){e.preventDefault();onProviderChange()};
     document.getElementById('gp-fetch').onclick=function(e){e.preventDefault();fetchModels()};
